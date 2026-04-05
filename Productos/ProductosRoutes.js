@@ -59,4 +59,45 @@ Routes.post("/productos", (req, res) => {
 });
 
 
+Routes.put('/productos/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const { nombre, precio, descripcion, id_categoria } = req.body;
+
+
+  db.run(
+    `UPDATE Productos 
+     SET nombre = ?, precio = ?, descripcion = ?, id_categoria = ?
+     WHERE id = ?`,
+    [nombre, precio, descripcion, id_categoria, id],
+    function (err) {
+      if (err) {
+        return res.status(500).json({ success: false, message: err.message });
+      }
+
+      if (this.changes === 0) {
+        return res.status(404).json({ success: false, message: 'Producto no encontrado' });
+      }
+
+      res.json({ success: true });
+    }
+  );
+});
+
+Routes.delete('/productos/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+
+
+  db.run("DELETE FROM Productos WHERE id = ?", [id], function (err) {
+    if (err) {
+      return res.status(500).json({ success: false, message: err.message });
+    }
+
+    if (this.changes === 0) {
+      return res.status(404).json({ success: false, message: 'producto no encontrado' });
+    }
+
+    res.json({ success: true });
+  });
+});
+
 module.exports = Routes;

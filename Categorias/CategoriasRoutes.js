@@ -8,7 +8,6 @@ const categorias = [
 ];
 
 
-// 🔹 Obtener categorías con búsqueda
 Routes.get("/categorias", (req, res) => {
 const { nombre } = req.query;
 
@@ -25,7 +24,7 @@ res.json({ success: true, data: filtered });
 });
 });
 
-// 🔹 Crear categoría
+
 Routes.post("/categorias", (req, res) => {
 const { nombre } = req.body;
 
@@ -47,6 +46,47 @@ function (err) {
   });
 }
 );
+});
+
+Routes.put('/categorias/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+  const { nombre } = req.body;
+
+
+  db.run(
+    `UPDATE Categorias 
+     SET nombre = ?
+     WHERE id = ?`,
+    [nombre, id],
+    function (err) {
+      if (err) {
+        return res.status(500).json({ success: false, message: err.message });
+      }
+
+      if (this.changes === 0) {
+        return res.status(404).json({ success: false, message: 'Categoria no encontrado' });
+      }
+
+      res.json({ success: true });
+    }
+  );
+});
+
+Routes.delete('/categorias/:id', (req, res) => {
+  const id = parseInt(req.params.id);
+
+
+  db.run("DELETE FROM Categorias WHERE id = ?", [id], function (err) {
+    if (err) {
+      return res.status(500).json({ success: false, message: err.message });
+    }
+
+    if (this.changes === 0) {
+      return res.status(404).json({ success: false, message: 'Categoria no encontrado' });
+    }
+
+    res.json({ success: true });
+  });
 });
 
 module.exports = Routes;
